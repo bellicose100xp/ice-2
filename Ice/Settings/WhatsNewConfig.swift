@@ -15,13 +15,17 @@ enum WhatsNewConfig {
         WhatsNewContent(
             version: Constants.versionString,
             date: "2026-07-06",
-            summary: "This release continues the push to keep Ice 2 idle and easy on your battery.",
+            summary: "Layout gets its own spot in Settings, plus a first-launch crash fix and a new What's New tab.",
             sections: [
                 ChangeSection(kind: .fixed, entries: [
-                    "Stopped a perpetual one-second permission poll that churned CPU while idle.",
-                    "Made menu bar item polling event-driven so it no longer wakes the app on a timer.",
-                    "The Menu Bar Appearance editor is now built only when you open it, not at launch.",
-                    "Closed Settings and Permissions windows no longer re-render in the background.",
+                    "Fixed a crash that could happen on first launch, before Accessibility was granted.",
+                ]),
+                ChangeSection(kind: .changed, entries: [
+                    "Moved the menu bar Layout editor out of Appearance into its own Settings tab, right after Appearance.",
+                    "Refreshed the About and Permissions screens and corrected the Settings sidebar text size.",
+                ]),
+                ChangeSection(kind: .added, entries: [
+                    "Added this What's New tab so you can see what changed in each version.",
                 ]),
             ]
         )

@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.9.0 - 2026-07-06
+
+### Fixed
+
+- **Fixed a crash on first launch.** Ice 2 could crash immediately on launch when Accessibility hadn't been granted yet (for example, right after a fresh install), because a permission check could retrigger itself in a tight loop. It now launches reliably and keeps checking for the permission in the background without recursing.
+
+### Changed
+
+- **Layout is now its own Settings tab.** The menu bar **Layout** editor moved out of the Appearance tab's Style/Layout switch into its own item in the Settings sidebar, right after Appearance — so you can jump straight to arranging your menu bar items.
+- **Refined the Settings UI.** About, What's New, and Permissions now use Ice 2's shared design components for a consistent look, and the Settings sidebar text is sized correctly.
+
+### Added
+
+- **What's New tab.** A new Settings tab shows what changed in the current version.
+
 ## 2.8.6 - 2026-07-05
 
 ### Fixed
