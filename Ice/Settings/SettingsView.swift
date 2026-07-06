@@ -126,6 +126,8 @@ struct SettingsView: View {
             UpdatesSettingsPane(updatesManager: appState.updatesManager)
         case .advanced:
             AdvancedSettingsPane(settings: appState.settings.advanced)
+        case .permissions:
+            PermissionsPane(permissions: [.accessibility(), .screenRecording()])
         case .backup:
             BackupSettingsPane()
         case .whatsNew:
