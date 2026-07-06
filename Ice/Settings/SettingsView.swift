@@ -23,24 +23,6 @@ struct SettingsView: View {
         }
     }
 
-    private var sidebarItemHeight: CGFloat {
-        switch sidebarRowSize {
-        case .small: 26
-        case .medium: 32
-        case .large: 34
-        @unknown default: 32
-        }
-    }
-
-    private var sidebarFontSize: CGFloat {
-        switch sidebarRowSize {
-        case .small: 13
-        case .medium: 15
-        case .large: 16
-        @unknown default: 15
-        }
-    }
-
     private var sidebarTextStyle: some ShapeStyle {
         appearsActive ? .primary : .secondary
     }
@@ -67,10 +49,11 @@ struct SettingsView: View {
                 }
             } header: {
                 Text("Ice 2")
-                    .font(.system(size: sidebarFontSize * 2.67, weight: .medium))
+                    .font(.title)
+                    .fontWeight(.medium)
                     .foregroundStyle(sidebarTextStyle)
                     .padding(.leading, sidebarPadding)
-                    .padding(.bottom, sidebarFontSize)
+                    .padding(.bottom, 8)
             }
             .collapsible(false)
         }
@@ -86,14 +69,12 @@ struct SettingsView: View {
     private func sidebarItem(for identifier: SettingsNavigationIdentifier) -> some View {
         Label {
             Text(identifier.localized)
-                .font(.system(size: sidebarFontSize))
                 .foregroundStyle(sidebarTextStyle)
         } icon: {
             identifier.iconResource.view
                 .foregroundStyle(sidebarTextStyle)
                 .padding(sidebarPadding)
         }
-        .frame(height: sidebarItemHeight)
         .tag(identifier)
     }
 
