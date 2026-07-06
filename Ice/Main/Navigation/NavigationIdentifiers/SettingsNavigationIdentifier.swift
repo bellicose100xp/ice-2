@@ -7,6 +7,7 @@
 enum SettingsNavigationIdentifier: String, NavigationIdentifier {
     case general = "General"
     case appearance = "Appearance"
+    case layout = "Layout"
     case hotkeys = "Hotkeys"
     case updates = "Updates"
     case advanced = "Advanced"
@@ -19,6 +20,7 @@ enum SettingsNavigationIdentifier: String, NavigationIdentifier {
         switch self {
         case .general: .systemSymbol("gearshape")
         case .appearance: .systemSymbol("paintpalette")
+        case .layout: .systemSymbol("menubar.rectangle")
         case .hotkeys: .systemSymbol("keyboard")
         case .updates: .systemSymbol("arrow.triangle.2.circlepath")
         case .advanced: .systemSymbol("gearshape.2")

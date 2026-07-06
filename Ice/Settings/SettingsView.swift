@@ -95,8 +95,9 @@ struct SettingsView: View {
         case .general:
             GeneralSettingsPane(settings: appState.settings.general)
         case .appearance:
-            AppearanceSettingsPane(
-                appearanceManager: appState.appearanceManager,
+            MenuBarAppearanceSettingsPane(appearanceManager: appState.appearanceManager)
+        case .layout:
+            MenuBarLayoutSettingsPane(
                 itemManager: appState.itemManager,
                 profileSettings: appState.settings.layoutProfiles,
                 spacerManager: appState.spacerManager
