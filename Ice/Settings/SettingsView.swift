@@ -131,7 +131,7 @@ struct SettingsView: View {
         case .whatsNew:
             WhatsNewPane(content: WhatsNewConfig.content)
         case .about:
-            AboutSettingsPane()
+            AboutPane(content: AboutConfig.content)
         }
     }
 }
