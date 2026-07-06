@@ -84,6 +84,13 @@ class Permission: ObservableObject, Identifiable {
         timerCancellable = Timer.publish(every: 1, on: .main, in: .default)
             .autoconnect()
             .merge(with: Just(.now))
+            // Deliver asynchronously on the main run loop. Without this, the merged
+            // `Just(.now)` fires *synchronously* during `.sink` subscription — before
+            // `timerCancellable` is assigned — so `refresh()` sees a nil `timerCancellable`
+            // and re-enters `configureCancellables()`, recursing infinitely and crashing at
+            // launch whenever the permission isn't already granted. Deferring one run-loop
+            // hop lets the assignment complete first, keeping the immediate check + polling.
+            .receive(on: RunLoop.main)
             .sink { [weak self] _ in
                 guard let self else {
                     return
