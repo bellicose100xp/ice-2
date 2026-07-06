@@ -1,5 +1,5 @@
 {
-  "originHash" : "977d7500481760b6dc046c9b6e7def6420058990c9c91809fa741c67a8f83c48",
+  "originHash" : "c254720ba435a738fa3ce166d356a841bc551687e830cf124477dd97fbcc21a8",
   "pins" : [
     {
       "identity" : "axswift",
@@ -16,6 +16,15 @@
       "location" : "https://github.com/buh/CompactSlider",
       "state" : {
         "revision" : "e5219ff353613b6493bfe5a3333c3bfa2d1e4d57",
+        "version" : "1.2.1"
+      }
+    },
+    {
+      "identity" : "dragon-kit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/teddychan/dragon-kit",
+      "state" : {
+        "revision" : "cae1bcb2b7eba65bb1af084c19d0d31306379f40",
         "version" : "1.2.1"
       }
     },
