@@ -11,6 +11,7 @@ enum SettingsNavigationIdentifier: String, NavigationIdentifier {
     case updates = "Updates"
     case advanced = "Advanced"
     case backup = "Backup & Restore"
+    case whatsNew = "What's New"
     case about = "About"
 
     var iconResource: IconResource {
@@ -21,6 +22,7 @@ enum SettingsNavigationIdentifier: String, NavigationIdentifier {
         case .updates: .systemSymbol("arrow.triangle.2.circlepath")
         case .advanced: .systemSymbol("gearshape.2")
         case .backup: .systemSymbol("externaldrive.badge.timemachine")
+        case .whatsNew: .systemSymbol("sparkles")
         case .about: .assetCatalog(.iceCubeStroke)
         }
     }

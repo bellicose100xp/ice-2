@@ -3,6 +3,7 @@
 //  Ice
 //
 
+import DragonKit
 import SwiftUI
 
 struct SettingsView: View {
@@ -127,6 +128,8 @@ struct SettingsView: View {
             AdvancedSettingsPane(settings: appState.settings.advanced)
         case .backup:
             BackupSettingsPane()
+        case .whatsNew:
+            WhatsNewPane(content: WhatsNewConfig.content)
         case .about:
             AboutSettingsPane()
         }
