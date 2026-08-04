@@ -3,7 +3,7 @@
 //  Ice
 //
 
-import LaunchAtLogin
+import DragonKit
 import SwiftUI
 
 struct GeneralSettingsPane: View {
@@ -11,6 +11,9 @@ struct GeneralSettingsPane: View {
     @ObservedObject var settings: GeneralSettings
     @State private var isApplyingItemSpacingOffset = false
     @State private var tempItemSpacingOffset: CGFloat = 0
+    /// Mirror of the OS login-item registration, re-read whenever the pane appears so a
+    /// change made in System Settings shows up here.
+    @State private var launchesAtLogin = LoginItem.isEnabled
 
     /// A single toggle backing both hover-to-show triggers (empty menu bar and Ice 2 icon).
     private var showOnHover: Binding<Bool> {
@@ -53,21 +56,21 @@ struct GeneralSettingsPane: View {
     }
 
     var body: some View {
-        IceForm {
-            IceSection {
+        DragonForm {
+            DragonSection {
                 appOptions
                 iceIconOptions
             }
-            IceSection("Show Hidden Items") {
+            DragonSection("Show Hidden Items") {
                 showOptions
             }
-            IceSection("Rehide") {
+            DragonSection("Rehide") {
                 rehideOptions
             }
-            IceSection("Ice 2 Bar") {
+            DragonSection("Ice 2 Bar") {
                 iceBarOptions
             }
-            IceSection {
+            DragonSection {
                 advancedOptions
             }
         }
@@ -75,9 +78,20 @@ struct GeneralSettingsPane: View {
 
     // MARK: App Options
 
+    /// Launch at login, via DragonKit's `LoginItem` — the single code path every Dragon app
+    /// (and the shared uninstall flow) uses to drive `SMAppService.mainApp`.
     @ViewBuilder
     private var appOptions: some View {
-        LaunchAtLogin.Toggle()
+        Toggle("Launch at login", isOn: Binding(
+            get: { launchesAtLogin },
+            set: { newValue in
+                LoginItem.setEnabled(newValue)
+                // Read the status back: registration can fail, and the toggle should show
+                // what the OS actually did rather than what was asked for.
+                launchesAtLogin = LoginItem.isEnabled
+            }
+        ))
+        .onAppear { launchesAtLogin = LoginItem.isEnabled }
     }
 
     // MARK: Ice Icon Options
@@ -85,7 +99,7 @@ struct GeneralSettingsPane: View {
     @ViewBuilder
     private var iceIconOptions: some View {
         Toggle("Show Ice 2 icon", isOn: $settings.showIceIcon)
-            .annotation("Click to show hidden menu bar items. Right-click to access Ice 2's settings. Customize the icon in the Appearance settings.")
+            .dragonAnnotation("Click to show hidden menu bar items. Right-click to access Ice 2's settings. Customize the icon in the Appearance settings.")
     }
 
     // MARK: Ice Bar Options
@@ -123,7 +137,7 @@ struct GeneralSettingsPane: View {
     @ViewBuilder
     private var useIceBar: some View {
         Toggle("Use Ice 2 Bar", isOn: $settings.useIceBar)
-            .annotation("Show hidden menu bar items in a separate bar below the menu bar.")
+            .dragonAnnotation("Show hidden menu bar items in a separate bar below the menu bar.")
             .disabled(settings.autoEnableIceBar)
     }
 
@@ -135,7 +149,7 @@ struct GeneralSettingsPane: View {
                 BetaBadge()
             }
         }
-        .annotation("Automatically enable or disable Ice 2 Bar based on the current display.")
+        .dragonAnnotation("Automatically enable or disable Ice 2 Bar based on the current display.")
     }
 
     @ViewBuilder
@@ -145,7 +159,7 @@ struct GeneralSettingsPane: View {
                 Text(mode.localized).tag(mode)
             }
         }
-        .annotation {
+        .dragonAnnotation {
             switch settings.iceBarAutoEnableMode {
             case .screenWidth:
                 Text("Enable Ice 2 Bar when the active menu bar screen is narrower than the threshold.")
@@ -168,7 +182,7 @@ struct GeneralSettingsPane: View {
         } label: {
             Text("Width threshold")
         }
-        .annotation("Ice 2 Bar will be enabled when the active menu bar screen is narrower than this width in points.")
+        .dragonAnnotation("Ice 2 Bar will be enabled when the active menu bar screen is narrower than this width in points.")
     }
 
     @ViewBuilder
@@ -178,7 +192,7 @@ struct GeneralSettingsPane: View {
                 Text(location.localized).tag(location)
             }
         }
-        .annotation {
+        .dragonAnnotation {
             switch settings.iceBarLocation {
             case .dynamic:
                 Text("The Ice 2 Bar's location changes based on context.")
@@ -204,10 +218,10 @@ struct GeneralSettingsPane: View {
     @ViewBuilder
     private var showOptions: some View {
         Toggle("Show on click", isOn: $settings.showOnClick)
-            .annotation("Click inside an empty area of the menu bar to show hidden menu bar items.")
+            .dragonAnnotation("Click inside an empty area of the menu bar to show hidden menu bar items.")
 
         Toggle("Show on hover", isOn: showOnHover)
-            .annotation("Hover over an empty area of the menu bar or the Ice 2 icon to show hidden menu bar items.")
+            .dragonAnnotation("Hover over an empty area of the menu bar or the Ice 2 icon to show hidden menu bar items.")
         if showOnHover.wrappedValue {
             IceSlider(
                 formattedToSeconds(hoverDelay.wrappedValue),
@@ -215,11 +229,11 @@ struct GeneralSettingsPane: View {
                 in: 0...1,
                 step: 0.1
             )
-            .annotation("The amount of time to wait before showing hidden items.")
+            .dragonAnnotation("The amount of time to wait before showing hidden items.")
         }
 
         Toggle("Show on scroll", isOn: $settings.showOnScroll)
-            .annotation("Scroll or swipe in the menu bar to show hidden menu bar items.")
+            .dragonAnnotation("Scroll or swipe in the menu bar to show hidden menu bar items.")
     }
 
     // MARK: Rehide Options
@@ -245,7 +259,7 @@ struct GeneralSettingsPane: View {
                     Text(strategy.localized).tag(strategy)
                 }
             }
-            .annotation {
+            .dragonAnnotation {
                 switch settings.rehideStrategy {
                 case .smart:
                     Text("Menu bar items are rehidden using a smart algorithm.")
@@ -310,11 +324,11 @@ struct GeneralSettingsPane: View {
                 }
             }
         }
-        .annotation(
+        .dragonAnnotation(
             "Applying this setting will relaunch all apps with menu bar items. Some apps may need to be manually relaunched.",
             spacing: 2
         )
-        .annotation(spacing: 10) {
+        .dragonAnnotation(spacing: 10) {
             CalloutBox(
                 "Note: You may need to log out and back in for this setting to apply properly.",
                 systemImage: "exclamationmark.circle"
