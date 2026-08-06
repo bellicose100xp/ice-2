@@ -118,7 +118,6 @@ rm -rf ~/Library/Application\ Support/com.dragonapp.ice \
 - [x] Menu bar item spacing (BETA)
 - [x] Profiles for menu bar layout
 - [x] Individual spacer items
-- [x] Menu bar item groups
 - [x] Show menu bar items when trigger conditions are met
 
 ### Menu bar appearance
@@ -185,7 +184,7 @@ versions of macOS. Older releases remain downloadable on the
 
 ### Can I back up, restore, or sync my settings?
 
-Yes. Open **Settings ▸ Backup & Restore** and choose a backup folder. Use **Back Up Now** to save a snapshot of all your Ice 2 settings (layout profiles, item groups, spacers, triggers, hotkeys, and appearance), and Ice 2 also backs up automatically when you quit. The newest 10 backups are kept; you can restore any of them with one click (Ice 2 relaunches to apply).
+Yes. Open **Settings ▸ Backup & Restore** and choose a backup folder. Use **Back Up Now** to save a snapshot of all your Ice 2 settings (layout profiles, spacers, triggers, hotkeys, and appearance), and Ice 2 also backs up automatically when you quit. The newest 10 backups are kept; you can restore any of them with one click (Ice 2 relaunches to apply).
 
 To **sync across Macs** or move to a new Mac, point the backup folder at a synced location such as Dropbox, iCloud Drive, or Google Drive — your settings then appear on your other Macs, where you can restore them.
 
@@ -206,10 +205,15 @@ xcodebuild -scheme Ice -destination 'platform=macOS' test
 
 The **Ice** scheme's test action runs the `IceTests` unit-test target.
 
+The Debug configuration builds the app as `com.dragonapp.ice.debug`, displayed as
+**Ice 2 Debug**, never the release id — so neither a local build nor the test host
+(which runs *inside* the app) can read or write the settings of an installed Ice 2.
+The product itself is the isolated app; nothing re-ids it afterwards, so only one
+bundle ever claims that id.
+
 To try a local build alongside an installed copy of Ice 2, use the debug runner. It
-builds the **Ice** scheme, re-ids the product as `Ice 2 Debug.app`
-(`com.dragonapp.ice.debug`), ad-hoc signs it, and launches it, so it gets its own
-permissions and settings instead of colliding with the release app:
+builds the **Ice** scheme and launches the product, which already has its own name,
+permissions, and settings, alongside the release app:
 
 ```sh
 bash scripts/run-debug.sh

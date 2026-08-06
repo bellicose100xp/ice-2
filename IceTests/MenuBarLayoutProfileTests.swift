@@ -52,18 +52,6 @@ struct MenuBarLayoutProfileTests {
         #expect(decoded == profile)
     }
 
-    @Test func groupCountAndCodableRoundTrip() throws {
-        let group = MenuBarItemGroup(
-            id: UUID(), name: "G",
-            createdAt: Date(timeIntervalSince1970: 1),
-            updatedAt: Date(timeIntervalSince1970: 2),
-            itemTags: [tag("A"), tag("B")]
-        )
-        #expect(group.itemCount == 2)
-        let data = try JSONEncoder().encode(group)
-        let decoded = try JSONDecoder().decode(MenuBarItemGroup.self, from: data)
-        #expect(decoded == group)
-    }
 }
 
 // MARK: - Section snapshot capture
@@ -270,7 +258,7 @@ struct MenuBarLayoutProfileCaptureTests {
         #expect(settings.profiles.count == 1)
     }
 
-    // MARK: - Apply / group guards without a live AppState
+    // MARK: - Apply guards without a live AppState
 
     @Test func applyProfileWithoutAppStateThrows() async {
         let settings = MenuBarLayoutProfilesSettings()
@@ -285,18 +273,6 @@ struct MenuBarLayoutProfileCaptureTests {
         }
     }
 
-    @Test func temporarilyShowGroupWithoutAppStateReturnsZero() async {
-        let settings = MenuBarLayoutProfilesSettings()
-        let group = MenuBarItemGroup(
-            id: UUID(), name: "G",
-            createdAt: Date(timeIntervalSince1970: 0),
-            updatedAt: Date(timeIntervalSince1970: 0),
-            itemTags: []
-        )
-        let count = await settings.temporarilyShowGroup(group)
-        #expect(count == 0)
-    }
-
     @Test func applyErrorHasUserFacingDescription() {
         #expect(
             MenuBarLayoutProfilesSettings.ApplyError.missingAppState.errorDescription
@@ -305,30 +281,30 @@ struct MenuBarLayoutProfileCaptureTests {
     }
 }
 
-// MARK: - Layout-capture cache refresh delay
+// MARK: - Post-move cache refresh delay
 
-struct MenuBarLayoutCaptureRefreshDelayTests {
+struct MenuBarCacheRefreshDelayTests {
     @Test func noMoveMeansNoDelay() {
-        #expect(MenuBarItemManager.layoutCaptureRefreshDelay(sinceLastMove: nil) == .zero)
+        #expect(MenuBarItemManager.cacheRefreshDelayAfterMoves(sinceLastMove: nil) == .zero)
     }
 
     @Test func recentMoveWaitsOutTheSkipWindow() {
         // Window is 1s + 50ms; a move 200ms ago must wait the remaining 850ms.
-        let delay = MenuBarItemManager.layoutCaptureRefreshDelay(sinceLastMove: .milliseconds(200))
+        let delay = MenuBarItemManager.cacheRefreshDelayAfterMoves(sinceLastMove: .milliseconds(200))
         #expect(delay == .milliseconds(850))
     }
 
     @Test func oldMoveMeansNoDelay() {
-        let delay = MenuBarItemManager.layoutCaptureRefreshDelay(sinceLastMove: .seconds(2))
+        let delay = MenuBarItemManager.cacheRefreshDelayAfterMoves(sinceLastMove: .seconds(2))
         #expect(delay == .zero)
     }
 
     @Test func moveAtExactWindowMeansNoDelay() {
         // The skip window is exactly 1s + 50ms; a move at the boundary needs no wait.
-        #expect(MenuBarItemManager.layoutCaptureRefreshDelay(sinceLastMove: .milliseconds(1050)) == .zero)
+        #expect(MenuBarItemManager.cacheRefreshDelayAfterMoves(sinceLastMove: .milliseconds(1050)) == .zero)
     }
 
     @Test func moveJustInsideWindowWaitsRemainder() {
-        #expect(MenuBarItemManager.layoutCaptureRefreshDelay(sinceLastMove: .milliseconds(1000)) == .milliseconds(50))
+        #expect(MenuBarItemManager.cacheRefreshDelayAfterMoves(sinceLastMove: .milliseconds(1000)) == .milliseconds(50))
     }
 }
