@@ -24,6 +24,70 @@
   `main` without a release of its own. v6's tag gate accepts only an exact `vX.Y.Z` and requires
   the What's New source to have changed since the preceding tag.
 
+## 2.14.2 - 2026-08-10
+
+### Fixed
+
+- **What's New inside the app was four releases out of date.** Ice 2's own **What's New** pane
+  still described 2.11.0 while 2.14.1 was the version running, so if you read the app rather than
+  this file, 2.12.0 through 2.14.0 were never announced to you at all — including that item groups
+  had been removed, which deleted any groups you had saved the moment you updated. The pane now
+  covers the menu bar icon placement added in 2.14.0, that removal from 2.12.0, and the 2.12.x
+  fixes, each entry naming the release it came from. 2.13.0 and 2.14.1 were framework bumps with
+  nothing user-facing in them and are deliberately absent rather than padded out. Updating this
+  pane is now a required part of every public release rather than something to remember, so it
+  cannot fall this far behind again.
+
+### Internal
+
+- **Nothing about the installed app behaves differently.** Everything below concerns running a
+  development build of Ice 2 on the same Mac as the copy you have installed. The two are meant to
+  be separate apps — separate identifier, separate name, separate permissions — and this release
+  is the audit of what was still shared between them. If you only ever run the installed Ice 2,
+  none of it applies to you.
+
+- **A development build's version stays a number.** `scripts/run-debug.sh` appended `(Debug)` to
+  `CFBundleShortVersionString`, which is the one field a public `vX.Y.Z` tag is checked against,
+  so every hands-on build left that field non-numeric. The script now asserts `X.Y.Z` and fails
+  loudly otherwise, stamping a separate build-channel key instead, which the shared framework
+  renders as `v2.14.2 Debug` beside the build number. About, logs and screenshots still say Debug
+  outright, while the number stays the numeric candidate the next release will carry: "Debug" is a
+  channel label, never part of a version.
+
+- **The two builds no longer ask macOS for the same helper service.** Ice 2 asks a small bundled
+  helper which app each menu bar item belongs to. That service's name was written out in full, in
+  a file that compiles into both the app and the helper, so an installed release and a development
+  build asked launchd for one name and their embedded helpers claimed one identifier — exactly the
+  collision that stops the two from being run at the same time. The name is now derived from
+  whichever bundle is running. The app's half of that agreement and the helper's half live in
+  different files, and a mismatch is silent at build time yet leaves every menu bar item without a
+  source app at runtime, so a test reads the embedded helper out of the built app and checks the
+  pair together.
+
+- **A development build cannot reach the production update feed.** It started Sparkle at launch
+  regardless, so a development build ran scheduled background checks against the real appcast,
+  while the manual **Check for Updates…** item put up an alert calling the check unsupported —
+  which described a hang rather than the policy. Updating is now off in such a build end to end:
+  no scheduled checks, the menu omits **Check for Updates…** rather than showing an item that does
+  nothing, and `scripts/run-debug.sh` deletes the feed address from the built bundle as well.
+  Merely reading the automatic-check preference was enough to start the updater, so "off" has to
+  mean never creating it, not just never checking.
+
+- **A development build no longer deletes the installed app's settings backups, or quits it.**
+  Three places treated the other Ice 2 as an unrelated third-party app. The default backup folder
+  `~/Documents/Ice Backups` was spelled out in source, so both builds wrote into it — and because
+  pruning keeps the ten newest *files* rather than the ten newest per build, with automatic
+  backups on by default, ten quits of a development build were enough to delete every backup the
+  installed copy had written. Applying a menu bar spacing offset quits and relaunches every app
+  that has a menu bar item, excluding only the running process, so changing spacing in a
+  development build terminated the installed release. And with both running, each offered the
+  other as the app to trigger a section on, which is never what anyone means. One predicate now
+  answers "is this one of ours" for all three, and the default backup folder is named per build.
+
+- Ice 2 now builds against version 3.3.0 of the shared Dragon app framework, up from 3.2.0. That
+  release is what renders the build-channel label beside the version, and what lets the app ask
+  whether it is a development build at all, so the isolation above depends on it.
+
 ## 2.14.1 - 2026-08-10
 
 ### Internal
