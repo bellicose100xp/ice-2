@@ -3,9 +3,9 @@
 # install-local.sh — build the Release product and install it as /Applications/Ice 2.app.
 #
 # The installed app is this fork's own build, signed with the developer team in the
-# project. It replaces the public release, so the script removes the Sparkle feed and
-# disables automatic update checks: otherwise the next public release would offer to
-# replace this build. Upstream changes arrive through `git merge upstream/main` instead.
+# project. Its Sparkle feed (SUFeedURL in App/Info.plist) points at this fork's GitHub
+# releases, so it updates from `scripts/release-local.sh` output, never from the public
+# Ice 2 release. Upstream changes arrive through `git merge upstream/main`.
 #
 # Usage: bash scripts/install-local.sh
 set -euo pipefail
@@ -46,14 +46,13 @@ if [[ -z "$identity" ]]; then
   exit 1
 fi
 
+# Same stamping as release-local.sh, so Sparkle compares like with like.
 build_number="$(git rev-list --count HEAD 2>/dev/null || echo 1)"
 "$pb" -c "Set :CFBundleVersion $build_number" "$plist"
-if "$pb" -c "Print :SUEnableAutomaticChecks" "$plist" >/dev/null 2>&1; then
-  "$pb" -c "Set :SUEnableAutomaticChecks false" "$plist"
-else
-  "$pb" -c "Add :SUEnableAutomaticChecks bool false" "$plist"
+commit_date="$(git log -1 --format=%cI 2>/dev/null || true)"
+if [[ -n "$commit_date" ]]; then
+  "$pb" -c "Set :DragonCommitDate $commit_date" "$plist" 2>/dev/null || "$pb" -c "Add :DragonCommitDate string $commit_date" "$plist"
 fi
-"$pb" -c "Delete :SUFeedURL" "$plist" 2>/dev/null || true
 
 echo "==> Re-signing with: $identity"
 codesign --force --deep --preserve-metadata=entitlements,flags,runtime --sign "$identity" "$app"
