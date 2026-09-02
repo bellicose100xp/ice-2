@@ -64,6 +64,15 @@ pkill -x "$APP_NAME" 2>/dev/null || true
 sleep 1
 rm -rf "$INSTALL_DIR/$APP_NAME.app"
 ditto "$app" "$INSTALL_DIR/$APP_NAME.app"
+
+# Remove the build product so only the installed copy claims the bundle id. Two
+# bundles with one id make Launch Services resolve it ambiguously, and it can then
+# launch the stale build. xcodebuild recreates the product on the next run.
+lsregister=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
+"$lsregister" -u "$app" >/dev/null 2>&1 || true
+rm -rf "$app"
+"$lsregister" -f "$INSTALL_DIR/$APP_NAME.app" >/dev/null 2>&1 || true
+
 open "$INSTALL_DIR/$APP_NAME.app"
 
 short_version="$("$pb" -c "Print :CFBundleShortVersionString" "$plist")"
