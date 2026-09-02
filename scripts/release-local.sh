@@ -114,6 +114,11 @@ echo "==> Generating appcast (signed with the Sparkle key in the keychain)"
 "$sparkle_bin/generate_appcast" --download-url-prefix "https://github.com/$REPO/releases/download/$tag/" -o "$out/appcast.xml" "$out"
 grep -q "sparkle:edSignature" "$out/appcast.xml"
 
+# Remove the build product so only /Applications/Ice 2.app claims the bundle id.
+lsregister=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
+"$lsregister" -u "$app" >/dev/null 2>&1 || true
+rm -rf "$app" "$derived/Build/Products/$CONFIG/MenuBarItemService.xpc"
+
 echo "==> Tagging $tag and publishing"
 git tag "$tag" "$built_sha"
 git push --quiet origin "$tag"

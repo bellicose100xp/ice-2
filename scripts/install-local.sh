@@ -71,7 +71,7 @@ ditto "$app" "$INSTALL_DIR/$APP_NAME.app"
 # launch the stale build. xcodebuild recreates the product on the next run.
 lsregister=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
 "$lsregister" -u "$app" >/dev/null 2>&1 || true
-rm -rf "$app"
+rm -rf "$app" "$derived/Build/Products/$CONFIG/MenuBarItemService.xpc"
 "$lsregister" -f "$INSTALL_DIR/$APP_NAME.app" >/dev/null 2>&1 || true
 
 open "$INSTALL_DIR/$APP_NAME.app"
