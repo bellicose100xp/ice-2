@@ -156,3 +156,31 @@ struct MenuBarItemImageCacheSectionsTests {
         #expect(sections.isEmpty)
     }
 }
+
+/// Pins the scale a captured item image is stored with to the pixels it actually has.
+///
+/// Captures run with `.bestResolution`, so a window on a 1x external display yields 1x
+/// pixels even when the cache expected the 2x built-in display. Storing the expected
+/// scale drew those images at half size in the Ice Bar. The scale now comes from the
+/// capture itself, and the expected scale is only a fallback.
+struct MenuBarItemImageCaptureScaleTests {
+    @Test func aOneXCaptureExpectedAtTwoXIsStoredAsOneX() {
+        #expect(MenuBarItemImageCache.capturedScale(pixelWidth: 30, pointWidth: 30, fallback: 2) == 1)
+    }
+
+    @Test func aTwoXCaptureExpectedAtOneXIsStoredAsTwoX() {
+        #expect(MenuBarItemImageCache.capturedScale(pixelWidth: 60, pointWidth: 30, fallback: 1) == 2)
+    }
+
+    @Test func aMatchingCaptureKeepsItsScale() {
+        #expect(MenuBarItemImageCache.capturedScale(pixelWidth: 60, pointWidth: 30, fallback: 2) == 2)
+    }
+
+    @Test func widthsThatAreNotAWholeScaleFallBack() {
+        #expect(MenuBarItemImageCache.capturedScale(pixelWidth: 45, pointWidth: 30, fallback: 2) == 2)
+    }
+
+    @Test func aZeroPointWidthFallsBack() {
+        #expect(MenuBarItemImageCache.capturedScale(pixelWidth: 60, pointWidth: 0, fallback: 2) == 2)
+    }
+}
