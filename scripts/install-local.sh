@@ -58,6 +58,8 @@ echo "==> Re-signing with: $identity"
 codesign --force --deep --preserve-metadata=entitlements,flags,runtime --sign "$identity" "$app"
 codesign --verify --deep --strict "$app"
 
+short_version="$("$pb" -c "Print :CFBundleShortVersionString" "$plist")"
+
 echo "==> Installing to $INSTALL_DIR/$APP_NAME.app"
 pkill -x "$APP_NAME" 2>/dev/null || true
 sleep 1
@@ -74,5 +76,4 @@ rm -rf "$app"
 
 open "$INSTALL_DIR/$APP_NAME.app"
 
-short_version="$("$pb" -c "Print :CFBundleShortVersionString" "$plist")"
 echo "Installed $APP_NAME v$short_version (build $build_number) from $(git rev-parse --short HEAD)."
